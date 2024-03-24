@@ -1,18 +1,29 @@
-import React, { useState } from "react";
-import { Box, Button, Container, Flex, FormControl, FormLabel, Heading, Input, Stack, Text, useToast, VStack } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Box, Button, Container, Flex, FormControl, FormLabel, Heading, Input, Stack, Text, useToast, VStack, List, ListItem } from "@chakra-ui/react";
 import { FaSignInAlt, FaUserPlus, FaPlusCircle } from "react-icons/fa";
+
+const CheckinItem = ({ checkin }) => (
+  <ListItem>
+    Order ID: {checkin.order_id}, Product ID: {checkin.product_id}, Item ID: {checkin.item_id}, Coupon: {checkin.coupone_code}, Count: {checkin.checkin_count}
+  </ListItem>
+);
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState("");
+  const [checkins, setCheckins] = useState([]);
   const toast = useToast();
 
   const handleLogin = async () => {
-    // Implement login logic here
-    // Call the /login endpoint with email and password
-    // If successful, set isLoggedIn to true and store the accessToken
+    const response = await fetch("https://backengine-v763.fly.dev/checkins", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json();
+    setCheckins(data);
   };
 
   const handleSignup = async () => {
@@ -60,6 +71,14 @@ const Index = () => {
             <Button leftIcon={<FaPlusCircle />} colorScheme="purple" onClick={handleCheckin}>
               Check-In
             </Button>
+            <Heading as="h3" size="md">
+              Checkins
+            </Heading>
+            <List spacing={3}>
+              {checkins.map((checkin) => (
+                <CheckinItem key={checkin.id} checkin={checkin} />
+              ))}
+            </List>
           </>
         )}
       </VStack>
