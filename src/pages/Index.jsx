@@ -17,13 +17,44 @@ const Index = () => {
   const toast = useToast();
 
   const handleLogin = async () => {
-    const response = await fetch("https://backengine-v763.fly.dev/checkins", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    const data = await response.json();
-    setCheckins(data);
+    try {
+      const response = await fetch("https://backengine-v763.fly.dev/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccessToken(data.accessToken);
+        setIsLoggedIn(true);
+        toast({
+          title: "Login Successful",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Login Failed",
+          description: errorData.error,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const handleSignup = async () => {
